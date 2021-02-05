@@ -1,0 +1,11 @@
+{
+    "@metadata": {
+        "authors": [
+            "WWBot Dev"
+        ],
+        "last-updated": "2021-02-01",
+        "locale": "zh-hant",
+        "message-documentation": "qqq"
+    },
+    "cmd-start-desc": "開始一場新遊戲"
+}

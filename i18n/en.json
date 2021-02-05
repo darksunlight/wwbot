@@ -1,0 +1,11 @@
+{
+    "@metadata": {
+        "authors": [
+            "WWBot Dev"
+        ],
+        "last-updated": "2021-02-01",
+        "locale": "en",
+        "message-documentation": "qqq"
+    },
+    "cmd-start-desc": "Starts a new game"
+}
