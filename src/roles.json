@@ -1,37 +1,30 @@
 {
     "wf": {
         "type": "wolf",
-        "name": "Wolf",
         "desc": "A relentless assassin aiming to wipe out either all villagers or all gods (or both). They can kill other players (including other wolves) during night time. "
     },
     "wk": {
         "type": "wolf",
-        "name": "Wolf King",
         "desc": "A wolf, but with the additional special ability to kill another player when it is killed (witch's poison deactivates this ability). "
     },
     "vl": {
         "type": "villager",
-        "name": "Villager",
         "desc": "A villager is a player with no special abilities. They can only vote who to kill during day time. "
     },
     "wc": {
         "type": "god",
-        "name": "Witch",
         "desc": "The witch has the abilities of reviving the dead and poisoning other players. Each ability can only be used once, and can only be uesd during night time. "
     },
     "se": {
         "type": "god",
-        "name": "Seer",
         "desc": "That person with the ability to see through other people's mind and reveal their true identiy. "
     },
     "id": {
         "type": "god",
-        "name": "Idiot",
         "desc": "A god? Or a villager? Or both? You can only tell when you vote the idiot out. "
     },
     "ht": {
         "type": "god",
-        "name": "Hunter",
         "desc": "Saves the villagers and gods with the ability to kill a player upon death. *Your sacrifice will be remembered.* "
     }
 }

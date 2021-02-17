@@ -33,6 +33,7 @@ client.on('message', msg => {
         }
         const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
         if (!command) return;
+        if (command.disabled) return log(msg.author.tag + " attempted to use a disabled command: " + commandName);
         if (command.su) {
             if(msg.author.id !== "531822031059288074") return msg.channel.send(`${msg.author.tag} is not in the sudoers file. This incident will be reported.`);
         }

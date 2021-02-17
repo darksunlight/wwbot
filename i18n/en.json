@@ -3,7 +3,7 @@
         "authors": [
             "WWBot Dev"
         ],
-        "last-updated": "2021-02-11",
+        "last-updated": "2021-02-17",
         "locale": "en",
         "message-documentation": "qqq"
     },
@@ -15,6 +15,7 @@
     "cmd-help-invalid-cmd": "<@$1>, that command is invalid.",
     "cmd-help-name": "**Name:** $1",
     "cmd-help-usage": "**Usage:** $1",
+    "cmd-roleinfo-desc": "Get info about a role",
     "cmd-rolelist-desc": "Output a list of roles",
     "cmd-start-desc": "Starts a new game",
     "comma-separator": ", ",

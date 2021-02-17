@@ -3,7 +3,7 @@
         "authors": [
             "WWBot Dev"
         ],
-        "last-updated": "2021-02-11",
+        "last-updated": "2021-02-17",
         "locale": "yue-hant",
         "message-documentation": "qqq"
     },
@@ -15,6 +15,7 @@
     "cmd-help-invalid-cmd": "<@$1>，嗰個指令無效。",
     "cmd-help-name": "**名：**$1",
     "cmd-help-usage": "**用法：**$1",
+    "cmd-roleinfo-desc": "獲取一個角色嘅資訊",
     "cmd-rolelist-desc": "輸出角色一覽",
     "cmd-start-desc": "開始一場新遊戲",
     "comma-separator": "、",

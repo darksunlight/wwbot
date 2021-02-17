@@ -19,7 +19,6 @@ module.exports = class {
         }else{
             this.role = roles[key];
             this.type = this.role.type;
-            this.name = this.role.name;
             this.name = i18n(`role-${key}`, this.lang);
             this.desc = this.role.desc;
             delete this.role;
