@@ -8,7 +8,7 @@ module.exports = {
     cooldown: 1,
     args: true,
     usage: '<code>',
-	description: i18n("cmd-start-desc", "en"),
+	description: "cmd-start-desc",
 	execute(message, args) {
         if(message.client.game!=null){
             if(!message.client.game.ended){

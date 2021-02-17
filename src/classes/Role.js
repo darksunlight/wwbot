@@ -1,5 +1,6 @@
 const log = require('../utils/log.js');
 const roles = require('../roles.json');
+const i18n = require('../i18n.js');
 
 module.exports = class {
     /**
@@ -7,9 +8,11 @@ module.exports = class {
      * 
      * @constructor
      * @param {string} key - identifying key for the role
+     * @param {string} lang - language code
      */
-    constructor(key) {
+    constructor(key, lang) {
         this.key = key;
+        this.lang = lang;
         if(typeof roles[key] === "undefined"){
             this.role = null;
             this.isValid = false;
@@ -17,6 +20,7 @@ module.exports = class {
             this.role = roles[key];
             this.type = this.role.type;
             this.name = this.role.name;
+            this.name = i18n(`role-${key}`, this.lang);
             this.desc = this.role.desc;
             delete this.role;
             this.isValid = true;

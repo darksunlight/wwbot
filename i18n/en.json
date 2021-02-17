@@ -3,9 +3,28 @@
         "authors": [
             "WWBot Dev"
         ],
-        "last-updated": "2021-02-01",
+        "last-updated": "2021-02-11",
         "locale": "en",
         "message-documentation": "qqq"
     },
-    "cmd-start-desc": "Starts a new game"
+    "cmd-endgame-desc": "Forces the current game to end",
+    "cmd-help-aliases": "**{{PLURAL:$2|Alias|Aliases}}:** $1",
+    "cmd-help-cooldown": "**Cooldown:** $1",
+    "cmd-help-desc": "List all of WWBot's commands or info about a specific command.",
+    "cmd-help-desc-string": "**Description:** $1",
+    "cmd-help-invalid-cmd": "<@$1>, that command is invalid.",
+    "cmd-help-name": "**Name:** $1",
+    "cmd-help-usage": "**Usage:** $1",
+    "cmd-rolelist-desc": "Output a list of roles",
+    "cmd-start-desc": "Starts a new game",
+    "comma-separator": ", ",
+    "error-disabled-guild": "WWBot has been disabled on this server.",
+    "role-ht": "Hunter",
+    "role-id": "Idiot",
+    "role-se": "Seer",
+    "role-vl": "Villager",
+    "role-wc": "Witch",
+    "role-wf": "Wolf",
+    "role-wk": "Wolf King",
+    "seconds": "{{PLURAL:$1|$1 second|$1 seconds}}"
 }

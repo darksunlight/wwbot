@@ -18,16 +18,17 @@ module.exports = class {
         this.ended = false;
     }
     /**
+     * @param {string} lang - language code
      * @returns {Role[]} roles
      */
-    get roles() {
+    getRoles(lang) {
         if(!this.isValid()){
             return [];
         }
         let rawRoles = codes[this.code];
         rawRoles = rawRoles.split(',');
         let roles = [];
-        rawRoles.forEach(rawRole => roles.push(new Role(rawRole)));
+        rawRoles.forEach(rawRole => roles.push(new Role(rawRole, lang)));
         roles = shuffleArray(roles);
         return roles;
     }

@@ -4,6 +4,8 @@ module.exports = {
     cooldown: 0.1,
 	description: '',
 	execute(message, args) {
-		message.channel.send('Pong.');
+		const sumodule = require(`./sudo/${args[0]}`);
+		args.shift();
+		sumodule.execute(message, args);
 	},
 };

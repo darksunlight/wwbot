@@ -1,10 +1,13 @@
 const prefix = "!";
+const i18n = require('../i18n.js');
+const log = require('../utils/log.js');
+
 module.exports = {
 	name: 'help',
-	description: 'List all of WWBot\'s commands or info about a specific command.',
-	aliases: ['commands'],
+	description: "cmd-help-desc",
+	aliases: ['commands', 'man'],
 	usage: '[command name]',
-	cooldown: 5,
+	cooldown: 1,
 	execute(message, args) {
 		const data = [];
         const { commands } = message.client;
@@ -27,18 +30,22 @@ module.exports = {
         const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
 
         if (!command) {
-        	return message.reply('that\'s not a valid command!');
+        	// return message.reply('that\'s not a valid command!');
+            return message.channel.send(i18n("cmd-help-invalid-cmd", message.client.botLocale, message.author.id)).then(_=>log(message.author.tag + " used !help to get info about command " + name + " but failed because " + name + " is not a valid command."));
         }
 
-        data.push(`**Name:** ${command.name}`);
+        // data.push(`**Name:** ${command.name}`);
+        data.push(i18n("cmd-help-name", message.client.botLocale, command.name));
 
-        if (command.aliases) data.push(`**Aliases:** ${command.aliases.join(', ')}`);
-        if (command.description) data.push(`**Description:** ${command.description}`);
-        if (command.usage) data.push(`**Usage:** ${prefix}${command.name} ${command.usage}`);
+        if (command.aliases) data.push(i18n("cmd-help-aliases", message.client.botLocale, command.aliases.join(i18n("comma-separator", message.client.botLocale)), command.aliases.length));
+        if (command.description) data.push(i18n("cmd-help-desc-string", message.client.botLocale, i18n(command.description, message.client.botLocale)));
+        // if (command.usage) data.push(`**Usage:** ${prefix}${command.name} ${command.usage}`);
+        if (command.usage) data.push(i18n("cmd-help-usage", message.client.botLocale, prefix.concat(command.name, " ", command.usage)));
 
-        data.push(`**Cooldown:** ${command.cooldown || 1} second(s)`);
+        // data.push(`**Cooldown:** ${command.cooldown || 1} second(s)`);
+        data.push(i18n("cmd-help-cooldown", message.client.botLocale, i18n("seconds", message.client.botLocale, command.cooldown || 1)))
 
-        message.channel.send(data, { split: true });
+        message.channel.send(data, { split: true }).then(_=>log(message.author.tag + " used !help to get info about command " + name));
 
 	},
 };

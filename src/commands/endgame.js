@@ -4,7 +4,7 @@ module.exports = {
     name: 'endgame',
     permissions: 'MANAGE_ROLES',
     cooldown: 1,
-    description: 'Forces the current game to end',
+    description: "cmd-endgame-desc",
     
     /**
      * 

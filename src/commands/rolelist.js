@@ -3,11 +3,12 @@ const log = require('../utils/log.js');
 module.exports = {
     name: 'rolelist',
     cooldown: 5,
-	description: 'Output a list of roles',
+	description: "cmd-rolelist-desc",
+	aliases: ['listroles'],
 	execute(message, args) {
-        if(message.client.game!=null){
+        if(message.client.game != null){
             if(!message.client.game.ended){
-                if(message.channel.name!="spectators"){
+                if(message.channel.name != "spectators"){
                     log(message.author.tag + " attempted to start a game with code " + args[0] + " but failed due to: A game is currently in progress.");
                     return message.channel.send("A game is currently in progress. You have to wait for the current game to end to see the role list.");
                 }

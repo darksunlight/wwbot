@@ -2,15 +2,13 @@ require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const log = require('./src/utils/log.js');
+const i18n = require('./src/i18n.js');
 
 const fs = require('fs');
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
 	const command = require(`./src/commands/${file}`);
-
-	// set a new item in the Collection
-	// with the key as the command name and the value as the exported module
 	client.commands.set(command.name, command);
 }
 const prefix = "!";
@@ -18,6 +16,7 @@ const cooldowns = new Discord.Collection();
 
 client.on('ready', () => {
     log(`Logged in as ${client.user.tag}!`);
+    client.botLocale = "en";
 });
 
 client.on('message', msg => {
@@ -27,15 +26,15 @@ client.on('message', msg => {
         if(msg.channel.type === "dm") {
             return msg.channel.send("Commands cannot be used in DMs.");
         }
-        if(msg.guild.id!="653535903511216129"){
-            return msg.channel.send("WWBot has been disabled on this server.");
-        }
         const args = msg.content.slice(prefix.length).trim().split(/ +/);
         const commandName = args.shift().toLowerCase();
+        if(msg.guild.id!="653535903511216129" && (commandName != "help" && commandName != "sudo")){
+            return msg.channel.send(i18n("error-disabled-guild", msg.client.botLocale));
+        }
         const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
         if (!command) return;
         if (command.su) {
-            if(msg.author.id !== "531822031059288074") return msg.reply("you do not have permission to use this command.");
+            if(msg.author.id !== "531822031059288074") return msg.channel.send(`${msg.author.tag} is not in the sudoers file. This incident will be reported.`);
         }
         if (command.permissions) {
             const authorPerms = msg.channel.permissionsFor(msg.author);

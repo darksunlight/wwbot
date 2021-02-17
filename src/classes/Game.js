@@ -33,7 +33,7 @@ module.exports = class {
             return message.channel.send(`The code ${this.code.code} is invalid.`);
         }
         message.channel.send(`Starting a new game with code ${this.code.code}...`);
-        this.roles = this.code.roles;
+        this.roles = this.code.getRoles(message.client.botLocale);
         let rolelist = "";
         this.wolves = [];
         this.gods = [];
