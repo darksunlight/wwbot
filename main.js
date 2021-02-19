@@ -3,6 +3,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const log = require('./src/utils/log.js');
 const i18n = require('./src/i18n.js');
+const server = require("./server/server.js");
 
 const fs = require('fs');
 client.commands = new Discord.Collection();
@@ -17,6 +18,7 @@ const cooldowns = new Discord.Collection();
 client.on('ready', () => {
     log(`Logged in as ${client.user.tag}!`);
     client.botLocale = "en";
+    server(client);
 });
 
 client.on('message', msg => {
@@ -28,7 +30,7 @@ client.on('message', msg => {
         }
         const args = msg.content.slice(prefix.length).trim().split(/ +/);
         const commandName = args.shift().toLowerCase();
-        if(msg.guild.id!="653535903511216129" && (commandName != "help" && commandName != "sudo")){
+        if(msg.guild.id!="653535903511216129" && (commandName != "help" && commandName != "sudo" && commandName != "man")){
             return msg.channel.send(i18n("error-disabled-guild", msg.client.botLocale));
         }
         const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));

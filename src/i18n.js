@@ -35,16 +35,17 @@ module.exports = (key, lang, ...args) => {
         }
     }
     if (string.includes("{{PLURAL:")){
-        let found = [...string.matchAll(/{{PLURAL:(\d+)\|(.*)}}/g)];
+        let found = [...string.matchAll(/{{PLURAL:(\d+)\.?\d?\|(.*)}}/g)];
         found = found[0];
+        console.log(found);
         found[2] = found[2].split("|");
         if(found[2].length === 1){
-            return string = string.replace(/{{PLURAL:\d+\|.*}}/, found[2][0]);
+            return string = string.replace(/{{PLURAL:\d+\.?\d?\|.*}}/, found[2][0]);
         }
         if(found[1] === "1"){
-            return string = string.replace(/{{PLURAL:\d+\|.*}}/, found[2][0]);
+            return string = string.replace(/{{PLURAL:\d+\.?\d?\|.*}}/, found[2][0]);
         } else{
-            return string = string.replace(/{{PLURAL:\d+\|.*}}/, found[2][1]);
+            return string = string.replace(/{{PLURAL:\d+\.?\d?\|.*}}/, found[2][1]);
         }
     }
     return string;
