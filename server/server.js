@@ -1,8 +1,7 @@
-module.exports = client => {
+module.exports = (client, port) => {
     const express = require("express");
     const bodyParser = require('body-parser');
     const app = express();
-    const port = 49620;
     const log = require("../src/utils/log.js");
 
     app.use(bodyParser.urlencoded({ extended: true }));

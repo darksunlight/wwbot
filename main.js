@@ -18,7 +18,7 @@ const cooldowns = new Discord.Collection();
 client.on('ready', () => {
     log(`Logged in as ${client.user.tag}!`);
     client.botLocale = "en";
-    server(client);
+    server(client, process.env.PORT);
 });
 
 client.on('message', msg => {
