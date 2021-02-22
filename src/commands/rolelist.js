@@ -3,9 +3,9 @@ const log = require('../utils/log.js');
 module.exports = {
     name: 'rolelist',
     cooldown: 5,
-	description: "cmd-rolelist-desc",
-	aliases: ['listroles'],
-	execute(message, args) {
+    description: "cmd-rolelist-desc",
+    aliases: ['listroles'],
+    execute(message, args) {
         if(message.client.game != null){
             if(!message.client.game.ended){
                 if(message.channel.name != "spectators"){

@@ -11,7 +11,7 @@ module.exports = {
      * @param {Discord.Message} message 
      * @param {*} args 
      */
-	execute(message, args) {
+    execute(message, args) {
         const wdc = message.guild.channels.cache.find(x => x.name === "狼人討論");
         for(let i=0; i<12; i++){
             wdc.updateOverwrite(
@@ -30,5 +30,5 @@ module.exports = {
             }
         }
         return message.channel.send("There are no active games at the moment.");
-	},
+    },
 };

@@ -49,7 +49,7 @@ module.exports = class {
                 this.villagers.push(i);
             }
         }
-        this.wolves.forEach(wolf => message.guild.channels.cache.find(x => x.name === "狼人討論").updateOverwrite(
+        this.wolves.forEach(wolf => message.guild.channels.cache.find(x => x.name === "狼人").updateOverwrite(
             message.guild.roles.cache.find(n => n.name === String(wolf+1) + "號"),
             { 'VIEW_CHANNEL': true, 'SEND_MESSAGES': true }
         ));

@@ -8,8 +8,8 @@ module.exports = {
     cooldown: 1,
     args: true,
     usage: '<code>',
-	description: "cmd-start-desc",
-	execute(message, args) {
+    description: "cmd-start-desc",
+    execute(message, args) {
         if(message.client.game!=null){
             if(!message.client.game.ended){
                 log(message.author.tag + " attempted to start a game with code " + args[0] + " but failed due to: A game is currently in progress.");
@@ -19,5 +19,5 @@ module.exports = {
         const game = new Game(message.client, args[0]);
         message.client.game = game;
         game.start(message);
-	},
+    },
 };

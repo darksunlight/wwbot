@@ -8,12 +8,12 @@ module.exports = {
     cooldown: 1,
     args: true,
     usage: '<role code>',
-	description: 'Get info about a game code',
-	execute(message, args) {
+    description: 'Get info about a game code',
+    execute(message, args) {
         const role = new Role(args[0]);
         if(!role.isValid){
             return message.channel.send(`That game code is invalid. `);
         }
         message.channel.send(`Information about the code "${role.name}": \n${role.desc}`);
-	},
+    },
 };

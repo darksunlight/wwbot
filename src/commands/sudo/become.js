@@ -1,7 +1,7 @@
 const log = require('../../utils/log.js');
 module.exports = {
     name: 'become',
-	execute(message, args) {
+    execute(message, args) {
         if(args[0] === "0") return log(message.author.tag + " has ceased to become");
         let become;
         try{
@@ -14,5 +14,5 @@ module.exports = {
         }
         message.reply("you have become " + args[0]);
         log(message.author.tag + " has become " + args[0]);
-	},
+    },
 };
