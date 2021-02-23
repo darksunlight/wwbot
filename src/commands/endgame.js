@@ -12,7 +12,7 @@ module.exports = {
      * @param {*} args 
      */
     execute(message, args) {
-        const wdc = message.guild.channels.cache.find(x => x.name === "狼人討論");
+        const wdc = message.guild.channels.cache.find(x => x.name === "狼人");
         for(let i=0; i<12; i++){
             wdc.updateOverwrite(
                 message.guild.roles.cache.find(n => n.name === String(i+1)+'號'),
