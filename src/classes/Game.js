@@ -1,10 +1,11 @@
-const Player = require('./Player.js');
+//const Player = require('./Player.js');
 const Code = require('./Code.js');
 const Role = require('./Role.js');
+const Discord = require('discord.js');
 const log = require('../utils/log.js');
 const intToEmoji = require('../utils/intToEmoji.js');
 const emojiToInt = require('../utils/emojiToInt.js');
-const Discord = require('discord.js');
+const endgame = require('../utils/endgame.js');
 const i18n = require('../i18n.js');
 
 module.exports = class {
@@ -21,6 +22,16 @@ module.exports = class {
         this.code = new Code(this.client, this.rawcode);
     }
     
+    checkIfEndgame() {
+        if(this.alive.wolf.length === 0){
+            return [true, true];
+        }else if(this.alive.god.length === 0 || this.alive.villager.length === 0){
+            return [true, false];
+        }else{
+            return [false];
+        }
+    }
+
     /**
      * Starts a game
      * 
@@ -36,18 +47,20 @@ module.exports = class {
         this.roles = this.code.getRoles(message.client.botLocale);
         let rolelist = "";
         this.alive = {
-            "wolves": [],
-            "gods": [],
-            "villagers": []
+            "wolf": [],
+            "god": [],
+            "villager": []
         };
+        this.aliveRaw = [];
         this.wolves = [];
         this.gods = [];
         this.villagers = [];
         for(let i=0; i<this.roles.length; i++){
             rolelist+=`${i+1}. ${this.roles[i].name}\n`;
+            this.aliveRaw[i] = true;
             message.guild.channels.cache.find(x => x.name === String(i+1)+"號").send(`Your role is **${this.roles[i].name}**. Description of your role: ${this.roles[i].desc}`);
             if(this.roles[i].type==="wolf"){
-                this.alive.wolves.push(i);
+                this.alive.wolf.push(i);
                 this.wolves.push(i);
             }else if(this.roles[i].type==="god"){
                 switch (this.roles[i].key) {
@@ -64,10 +77,10 @@ module.exports = class {
                         this.hunter = i;
                         break;
                 }
-                this.alive.gods.push(i);
+                this.alive.god.push(i);
                 this.gods.push(i);
             }else if(this.roles[i].type==="villager"){
-                this.alive.villagers.push(i);
+                this.alive.villager.push(i);
                 this.villagers.push(i);
             }
         }
@@ -100,22 +113,40 @@ module.exports = class {
         message.channel.send(`Night has fallen. Everyone sleeps. `).then(_=>log("Night has fallen in " + message.guild.name));
         message.guild.channels.cache.find(x => x.name === "狼人").send("Click on the number of the player you would like to kill. (CAUTION: You can't change your mind)").then(msg => {
             for(let i = 0; i < this.roles.length; i++){
-                msg.react(intToEmoji.main(i));
+                if(this.aliveRaw[i]){
+                    msg.react(intToEmoji.main(i));
+                }
             }
             msg.awaitReactions(
-                (r, u) => {let eArray = intToEmoji.getArray(this.roles.length); return eArray.indexOf(r.emoji.name) >= 0 && u.id !== "653535759508439051"},
+                (r, u) => {let eArray = intToEmoji.getArray(this.aliveRaw); return eArray.indexOf(r.emoji.name) >= 0 && u.id !== "653535759508439051"},
                 {max: 1}
             ).then(collected => {
                 let key = emojiToInt(collected.keyArray()[0]);
                 msg.channel.send(`Player ${key+1} has been killed.`).then(_ => {
+                    this.aliveRaw[key] = false;
                     log(`Player ${key} killed.`);
-                    this._stage2(message);
-                });
+                    message.channel.send("The wolves' side has killed a player.").then(_ => {
+                        this.alive[this.roles[key].type] = this.alive[this.roles[key].type].filter(n => n !== key);
+                        let endgStatus = this.checkIfEndgame();
+                        if(!endgStatus[0]){
+                            return this._stage2(message);
+                        }else{
+                            if(endgStatus[1]){
+                                endgame(message, "Villagers");
+                            }else{
+                                endgame(message, "Wolves");
+                            }
+                        }
+                    }).catch(console.error);
+                }).catch(console.error);
             }).catch(console.error);
         }).catch(console.error);
     }
 
     _stage2(message) {
-        console.log(this);
+        console.log(this.alive);
+        if(this.alive.god.includes(this.witch)){
+
+        }
     }
 }

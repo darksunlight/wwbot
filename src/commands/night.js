@@ -3,10 +3,10 @@ const Discord = require('discord.js');
 const endgame = require("../utils/endgame.js");
 
 module.exports = {
-    name: 'endgame',
-    permissions: 'MANAGE_ROLES',
+    name: 'night',
+    su: true,
     cooldown: 1,
-    description: "cmd-endgame-desc",
+    description: "cmd-night-desc",
     
     /**
      * 
@@ -14,6 +14,6 @@ module.exports = {
      * @param {*} _
      */
     execute(message, _) {
-        return endgame(message, null, true);
+        message.client.game.night(message);
     },
 };

@@ -4,8 +4,8 @@ module.exports.main = x => {
 }
 module.exports.getArray = x => {
     let newArray = [];
-    for (let i = 0; i < x; i++){
-        newArray.push(intToEmoji[i]);
+    for (let i = 0; i < x.length; i++){
+        if(x) newArray.push(intToEmoji[i]);
     }
     return newArray;
 }
