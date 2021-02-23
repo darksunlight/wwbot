@@ -55,6 +55,7 @@ module.exports = class {
         this.wolves = [];
         this.gods = [];
         this.villagers = [];
+        this.potionStatus = [false, false];
         for(let i=0; i<this.roles.length; i++){
             rolelist+=`${i+1}. ${this.roles[i].name}\n`;
             this.aliveRaw[i] = true;
@@ -66,6 +67,7 @@ module.exports = class {
                 switch (this.roles[i].key) {
                     case "wc":
                         this.witch = i;
+                        this.potionStatus = [true, true];
                         break;
                     case "se":
                         this.seer = i;
@@ -103,11 +105,16 @@ module.exports = class {
             if(i == this.wolves.length - 1){
                 this._stage1(message);
             }else{
-                i++;
+                ++i;
                 this.allowWDC(message, i);
             }
         }).catch(console.error);
     }
+
+    /**
+     * 
+     * @param {Discord.Message} message 
+     */
 
     _stage1(message) {
         message.channel.send(`Night has fallen. Everyone sleeps. `).then(_=>log("Night has fallen in " + message.guild.name));
@@ -118,7 +125,29 @@ module.exports = class {
                 }
             }
             msg.awaitReactions(
-                (r, u) => {let eArray = intToEmoji.getArray(this.aliveRaw); return eArray.indexOf(r.emoji.name) >= 0 && u.id !== "653535759508439051"},
+                (r, u) => {
+                    let eArray = intToEmoji.getArray(this.aliveRaw);
+                    if(u.bot || eArray.indexOf(r.emoji.name) < 0){
+                        return false;
+                    }
+                    message.guild.members.fetch(u.id).then(user => {
+                        let roles = user.roles.cache.array();
+                        let wfRolesNames = [];
+                        for(let i = 0; i < this.alive.wolf.length; i++){
+                            wfRolesNames.push(`${String(this.alive.wolf[i] + 1)}號`);
+                        }
+                        roles.forEach(role => {
+                            if(role.name === "Dead"){
+                                log(`Spectator ${user.user.tag} attempted to kill other players despite being dead.`);
+                                return false;
+                            }
+                            if(role.name === "MC" || role.name === "Developer" || wfRolesNames.includes(role.name)){
+                                return true;
+                            }
+                        });
+                        return false;
+                    });
+                }, 
                 {max: 1}
             ).then(collected => {
                 let key = emojiToInt(collected.keyArray()[0]);
@@ -143,10 +172,15 @@ module.exports = class {
         }).catch(console.error);
     }
 
-    _stage2(message) {
+    _stage2(message, killed) {
         console.log(this.alive);
         if(this.alive.god.includes(this.witch)){
-
+            if(this.potionStatus[0]){
+                message.guild.channels.cache.find(x => x.name === `${String(this.witch+1)}號`).send(`Player ${killed+1} was killed tonight. Use the save potion?`).then(msg => {
+                    msg.react("✅");
+                    msg.react("");
+                });
+            }
         }
     }
 }
