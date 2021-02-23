@@ -5,6 +5,7 @@ const Discord = require('discord.js');
 const log = require('../utils/log.js');
 const intToEmoji = require('../utils/intToEmoji.js');
 const emojiToInt = require('../utils/emojiToInt.js');
+const emojiToBool = require('../utils/emojiToBool.js');
 const endgame = require('../utils/endgame.js');
 const i18n = require('../i18n.js');
 
@@ -116,71 +117,111 @@ module.exports = class {
      * @param {Discord.Message} message 
      */
 
-    _stage1(message) {
-        message.channel.send(`Night has fallen. Everyone sleeps. `).then(_=>log("Night has fallen in " + message.guild.name));
-        message.guild.channels.cache.find(x => x.name === "狼人").send("Click on the number of the player you would like to kill. (CAUTION: You can't change your mind)").then(msg => {
-            for(let i = 0; i < this.roles.length; i++){
-                if(this.aliveRaw[i]){
-                    msg.react(intToEmoji.main(i));
-                }
+    async _stage1(message) {
+        await message.channel.send(`Night has fallen. Everyone sleeps. `);
+        log("Night has fallen in " + message.guild.name);
+        /** @type {Discord.Message} */
+        const msg = await message.guild.channels.cache.find(x => x.name === "狼人").send("Click on the number of the player you would like to kill. (CAUTION: You can't change your mind)");
+        for(let i = 0; i < this.roles.length; i++){
+            if(this.aliveRaw[i]){
+                await msg.react(intToEmoji.main(i));
             }
-            msg.awaitReactions(
-                (r, u) => {
-                    let eArray = intToEmoji.getArray(this.aliveRaw);
-                    if(u.bot || eArray.indexOf(r.emoji.name) < 0){
+        }
+        let wfRolesNames = [];
+        for(let i = 0; i < this.alive.wolf.length; i++){
+            wfRolesNames.push(`${String(this.alive.wolf[i] + 1)}號`);
+        }
+        const collected = await msg.awaitReactions(
+            async (r, u) => {
+                let eArray = intToEmoji.getArray(this.aliveRaw);
+                if(u.bot || eArray.indexOf(r.emoji.name) < 0) return false;
+                const user = await message.guild.members.fetch(u.id);
+                let roles = user.roles.cache.array();
+                for(let i = 0; i < roles.length; i++){
+                    let role = roles[i];
+                    if(role.name == "Dead"){
+                        log(`Spectator ${user.user.tag} attempted to use the save potion despite being dead.`);
                         return false;
+                    }else if(role.name == "MC" || role.name == "Developer" || wfRolesNames.includes(role.name)){
+                        return true;
                     }
-                    message.guild.members.fetch(u.id).then(user => {
-                        let roles = user.roles.cache.array();
-                        let wfRolesNames = [];
-                        for(let i = 0; i < this.alive.wolf.length; i++){
-                            wfRolesNames.push(`${String(this.alive.wolf[i] + 1)}號`);
-                        }
-                        roles.forEach(role => {
-                            if(role.name === "Dead"){
-                                log(`Spectator ${user.user.tag} attempted to kill other players despite being dead.`);
-                                return false;
-                            }
-                            if(role.name === "MC" || role.name === "Developer" || wfRolesNames.includes(role.name)){
-                                return true;
-                            }
-                        });
-                        return false;
-                    });
-                }, 
-                {max: 1}
-            ).then(collected => {
-                let key = emojiToInt(collected.keyArray()[0]);
-                msg.channel.send(`Player ${key+1} has been killed.`).then(_ => {
-                    this.aliveRaw[key] = false;
-                    log(`Player ${key} killed.`);
-                    message.channel.send("The wolves' side has killed a player.").then(_ => {
-                        this.alive[this.roles[key].type] = this.alive[this.roles[key].type].filter(n => n !== key);
-                        let endgStatus = this.checkIfEndgame();
-                        if(!endgStatus[0]){
-                            return this._stage2(message);
-                        }else{
-                            if(endgStatus[1]){
-                                endgame(message, "Villagers");
-                            }else{
-                                endgame(message, "Wolves");
-                            }
-                        }
-                    }).catch(console.error);
-                }).catch(console.error);
+                }
+                return false;
+            }, 
+            {max: 1}
+        );
+        msg.delete();
+        let key = emojiToInt(collected.keyArray()[0]);
+        msg.channel.send(`Player ${key+1} has been killed.`).then(_ => {
+            this.aliveRaw[key] = false;
+            this.alive[this.roles[key].type] = this.alive[this.roles[key].type].filter(n => n !== key);
+            log(`Player ${key} killed.`);
+            message.channel.send("The wolves' side has killed a player.").then(_ => {
+                let endgStatus = this.checkIfEndgame();
+                if(!endgStatus[0]){
+                    return this._stageWCSave(message, key);
+                }else{
+                    if(endgStatus[1]){
+                        endgame(message, "Villagers");
+                    }else{
+                        endgame(message, "Wolves");
+                    }
+                }
             }).catch(console.error);
         }).catch(console.error);
     }
 
-    _stage2(message, killed) {
+    /**
+     * 
+     * @param {Discord.Message} message 
+     * @param {Number} killed 
+     */
+    async _stageWCSave(message, killed) {
         console.log(this.alive);
-        if(this.alive.god.includes(this.witch)){
+        if(this.alive.god.includes(this.witch) || killed === this.witch){
             if(this.potionStatus[0]){
-                message.guild.channels.cache.find(x => x.name === `${String(this.witch+1)}號`).send(`Player ${killed+1} was killed tonight. Use the save potion?`).then(msg => {
-                    msg.react("✅");
-                    msg.react("");
-                });
+                /** @type {Discord.Message} */
+                const msg = await message.guild.channels.cache.find(x => x.name === `${String(this.witch+1)}號`).send(`Player ${killed+1} was killed tonight. Use the save potion?`);
+                await msg.react("✅");
+                await msg.react("❎");
+                const collected = await msg.awaitReactions(
+                    async (r, u) => {
+                        if(u.bot || !["✅", "❎"].includes(r.emoji.name)) return false;
+                        const user = await message.guild.members.fetch(u.id);
+                        let roles = user.roles.cache.array();
+                        for(let i = 0; i < roles.length; i++){
+                            let role = roles[i];
+                            if(role.name == "Dead"){
+                                log(`Spectator ${user.user.tag} attempted to use the save potion despite being dead.`);
+                                return false;
+                            }else if(role.name == "MC" || role.name == "Developer" || role.name == `${String(this.witch+1)}號`){
+                                return true;
+                            }
+                        }
+                        return false;
+                    },
+                    {max: 1}
+                );
+                msg.delete();
+                let saved = emojiToBool(collected.keyArray()[0]);
+                console.log(saved);
+                if(saved){
+                    this.aliveRaw[killed] = true;
+                    this.alive[this.roles[killed].type].push(killed);
+                    msg.channel.send(`Player ${String(killed+1)} saved!`);
+                    console.log(this.alive);
+                    this._stageSESee(message, []);
+                }
             }
         }
+    }
+
+    /**
+     * 
+     * @param {Discord.Message} message 
+     * @param {Array} killed 
+     */
+    _stageSESee(message, killed) {
+
     }
 }
