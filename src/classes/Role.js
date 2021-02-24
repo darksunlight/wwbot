@@ -18,6 +18,7 @@ module.exports = class {
             this.isValid = false;
         }else{
             this.role = roles[key];
+            /** @type {string} */
             this.type = this.role.type;
             this.name = i18n(`role-${key}`, this.lang);
             this.desc = this.role.desc;

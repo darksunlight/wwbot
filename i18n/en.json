@@ -3,7 +3,7 @@
         "authors": [
             "WWBot Dev"
         ],
-        "last-updated": "2021-02-17",
+        "last-updated": "2021-02-23",
         "locale": "en",
         "message-documentation": "qqq"
     },
@@ -20,6 +20,13 @@
     "cmd-start-desc": "Starts a new game",
     "comma-separator": ", ",
     "error-disabled-guild": "WWBot has been disabled on this server.",
+    "game-vls": "Villagers",
+    "game-wfs": "Wolves",
+    "game-day-announce-0": "It's day time!",
+    "game-day-announce-1": "Last night, {{PLURAL:$1|$1 player|$1 players}} died.",
+    "game-day-announce-2": "They are player $1 and player $2.",
+    "game-day-announce-3": "They are player $1",
+    "game-day-announce-silent-night": "No one died last night.",
     "role-ht": "Hunter",
     "role-id": "Idiot",
     "role-se": "Seer",

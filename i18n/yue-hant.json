@@ -3,7 +3,7 @@
         "authors": [
             "WWBot Dev"
         ],
-        "last-updated": "2021-02-17",
+        "last-updated": "2021-02-23",
         "locale": "yue-hant",
         "message-documentation": "qqq"
     },
@@ -20,6 +20,8 @@
     "cmd-start-desc": "開始一場新遊戲",
     "comma-separator": "、",
     "error-disabled-guild": "WWBot喺呢個伺服器被停用。",
+    "game-vls": "村民",
+    "game-wfs": "狼人",
     "role-ht": "獵人",
     "role-id": "白癡",
     "role-se": "預言家",

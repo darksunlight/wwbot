@@ -1,4 +1,4 @@
-const emojiToInt = {
+const emojiToAny = {
     "1⃣": 0,
     "2⃣": 1,
     "3⃣": 2,
@@ -10,14 +10,16 @@ const emojiToInt = {
     "9⃣": 8,
     "🔟": 9,
     "🅰️": 10,
-    "🅱️": 11
+    "🅱️": 11,
+    "✅": true,
+    "❎": false
 }
 
 /**
  * 
  * @param {string} x 
- * @returns {number}
+ * @returns {number|boolean}
  */
 module.exports = x => {
-    return emojiToInt[x];
+    return emojiToAny[x];
 }
