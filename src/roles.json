@@ -26,5 +26,13 @@
     "ht": {
         "type": "god",
         "desc": "Saves the villagers and gods with the ability to kill a player upon death. *Your sacrifice will be remembered.* "
+    },
+    "kt": {
+        "type": "god",
+        "desc": "Reveal to the public the true identity of a wolf! Be careful, though. If the player you checked is good, you would have to sacrifice yourself."
+    },
+    "gd": {
+        "type": "god",
+        "desc": "Guard people from the dangers of the night!"
     }
 }

@@ -1,4 +1,5 @@
-const log = require('./log.js');
+const log = require("./log.js");
+const i18n = require("../i18n.js");
 module.exports = (message, side, forceful = false) => {
     const wdc = message.guild.channels.cache.find(x => x.name === "狼人");
     for(let i=0; i<12; i++){
@@ -18,7 +19,7 @@ module.exports = (message, side, forceful = false) => {
                 return message.channel.send("Successfully ended game with game code " + message.client.game.code.code);
             }else{
                 log(`Game ended in ${message.guild.name}`);
-                return message.channel.send(`Game ended! ${side} won!`);
+                return message.channel.send(i18n("game-end-message", message.client.botLocale, side));
             }
         }
     }

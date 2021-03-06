@@ -58,6 +58,7 @@ module.exports = class {
         this.gods = [];
         this.villagers = [];
         this.potionStatus = [false, false];
+        this.wfKilled = 99;
         for(let i=0; i<this.roles.length; i++){
             rolelist+=`${i+1}. ${this.roles[i].name}\n`;
             this.aliveRaw[i] = true;
@@ -80,6 +81,13 @@ module.exports = class {
                         break;
                     case "ht":
                         this.hunter = i;
+                        break;
+                    case "kt":
+                        this.knight = i;
+                        this.ktChecked = false;
+                        break;
+                    case "gd":
+                        this.guard = i;
                         break;
                 }
                 this.alive.god.push(i);
@@ -115,17 +123,18 @@ module.exports = class {
     }
 
     /**
+     * Stage 1 - Wolf Kill
      * 
      * @param {Discord.Message} message 
      */
 
     async _stage1(message) {
-        await message.channel.send(`Night has fallen. Everyone sleeps. `);
+        await message.channel.send(i18n("game-night-announce", message.client.botLocale));
         log("Night has fallen in " + message.guild.name);
         /** @type {Discord.Message} */
-        const msg = await message.guild.channels.cache.find(x => x.name === "狼人").send("Click on the number of the player you would like to kill. (CAUTION: You can't change your mind)");
+        const msg = await message.guild.channels.cache.find(x => x.name === "狼人").send(i18n("game-wf-prompt", message.client.botLocale));
         for(let i = 0; i < this.roles.length; i++){
-            if(this.aliveRaw[i]){
+            if(this.aliveRaw[i] && i !== this.wfKilled){
                 await msg.react(intToEmoji.main(i));
             }
         }
@@ -158,6 +167,7 @@ module.exports = class {
         let key = emojiToInt(collected.keyArray()[0]);
         this.aliveRaw[key] = false;
         this.alive[this.roles[key].type] = this.alive[this.roles[key].type].filter(n => n !== key);
+        this.wfKilled = key;
         await msg.channel.send(`Player ${key+1} has been killed.`);
         log(`Player ${key} killed.`);
         await message.channel.send("The wolves' side has killed a player.");
@@ -165,7 +175,7 @@ module.exports = class {
         let endgStatus = this.checkIfEndgame();
         if(!endgStatus[0]){
             log(`Wolf killed, endgame criteria not fulfilled, proceeding to witch`);
-            return this._stageWCSave(message, key);
+            return this._stageWCSave(message);
         }else{
             if(endgStatus[1]){
                 log(`Wolf killed, endgame criteria fulfilled, villager win, proceeding to endgame`);
@@ -179,15 +189,14 @@ module.exports = class {
 
     /**
      * 
-     * @param {Discord.Message} message 
-     * @param {number} killed 
+     * @param {Discord.Message} message
      */
-    async _stageWCSave(message, killed) {
+    async _stageWCSave(message) {
         console.log(this.alive);
-        if(this.aliveRaw[this.witch] || killed === this.witch){
+        if(this.aliveRaw[this.witch] || this.wfKilled === this.witch){
             if(this.potionStatus[0]){
                 /** @type {Discord.Message} */
-                const msg = await message.guild.channels.cache.find(x => x.name === `${String(this.witch+1)}號`).send(`Player ${killed+1} was killed tonight. Use the save potion?`);
+                const msg = await message.guild.channels.cache.find(x => x.name === `${String(this.witch+1)}號`).send(i18n("game-wcsave-prompt", message.client.botLocale, this.wfKilled+1));
                 await msg.react("✅");
                 await msg.react("❎");
                 log("Reacted to message and waiting for user input, witch save");
@@ -213,26 +222,26 @@ module.exports = class {
                 await msg.delete();
                 let saved = emojiToBool(collected.keyArray()[0]);
                 if(saved){
-                    this.aliveRaw[killed] = true;
-                    this.alive[this.roles[killed].type].push(killed);
+                    this.aliveRaw[this.wfKilled] = true;
+                    this.alive[this.roles[this.wfKilled].type].push(this.wfKilled);
                     this.potionStatus[0] = false;
-                    await msg.channel.send(`Player ${String(killed+1)} saved!`);
-                    log(`Player ${String(killed)} revived by witch`);
+                    await msg.channel.send(i18n("game-wcsave-saved", message.client.botLocale, String(this.wfKilled+1)));
+                    log(`Player ${String(this.wfKilled)} revived by witch`);
                     console.log(this.alive);
                     this._stageSESee(message, false, false);
                 }else{
-                    await msg.channel.send(`You refused to save player ${String(killed+1)}.`);
-                    log(`Witch refused to save ${String(killed)}`);
+                    await msg.channel.send(i18n("game-wcsave-refused", message.client.botLocale, String(this.wfKilled+1)));
+                    log(`Witch refused to save ${String(this.wfKilled)}`);
                     console.log(this.alive);
-                    this._stageWCPoison(message, killed);
+                    this._stageWCPoison(message, this.wfKilled);
                 }
             }else{
                 log(`Witch save potion used up, skipping to witch poison`);
-                this._stageWCPoison(message, killed);
+                this._stageWCPoison(message, this.wfKilled);
             }
         }else{
             log(`Witch is dead and cannot revive self, skipping to seer`);
-            this._stageSESee(message, killed, false);
+            this._stageSESee(message, this.wfKilled, false);
         }
     }
     /**
@@ -244,7 +253,7 @@ module.exports = class {
         if(this.aliveRaw[this.witch] || killed === this.witch){
             if(this.potionStatus[1]){
                 /** @type {Discord.Message} */
-                const msg = await message.guild.channels.cache.find(x => x.name === `${String(this.witch+1)}號`).send(`Who would you like to poison?`);
+                const msg = await message.guild.channels.cache.find(x => x.name === `${String(this.witch+1)}號`).send(i18n("game-wcpoison-prompt", message.client.botLocale));
                 let eArray = [];
                 for(let i = 0; i < this.roles.length; i++){
                     if(killed === i){
@@ -279,11 +288,11 @@ module.exports = class {
                 let poisoned = emojiToAny(collected.keyArray()[0]);
                 if(poisoned === false){
                     log(`Witch chose to not use poison, proceeding to seer`);
-                    msg.channel.send(`You have chosen to not use your poison potion tonight.`);
+                    msg.channel.send(i18n("game-wcpoison-nopoison", message.client.botLocale));
                     return this._stageSESee(message, killed, false);
                 }else{
                     log(`Witch chose to poison ${poisoned}`);
-                    msg.channel.send(`:test_tube: Player ${String(poisoned+1)} poisoned.`);
+                    msg.channel.send(i18n("game-wcpoison-poisoned", message.client.botLocale, String(poisoned+1)));
                     this.aliveRaw[poisoned] = false;
                     this.alive[this.roles[poisoned].type] = this.alive[this.roles[poisoned].type].filter(n => n !== poisoned);
                     this.potionStatus[1] = false;
@@ -322,7 +331,7 @@ module.exports = class {
         let died = [killed, poisoned];
         if(this.aliveRaw[this.seer] || died.includes(this.seer)){
             /** @type {Discord.Message} */
-            const msg = await message.guild.channels.cache.find(x => x.name === `${String(this.seer+1)}號`).send(`Click on the number of the player you would like to check. `);
+            const msg = await message.guild.channels.cache.find(x => x.name === `${String(this.seer+1)}號`).send(i18n("game-sesee-prompt", message.client.botLocale));
             let eArray = [];
             for(let i = 0; i < this.roles.length; i++){
                 if(died.includes(i)){
@@ -355,10 +364,10 @@ module.exports = class {
             await msg.delete();
             let checked = emojiToInt(collected.keyArray()[0]);
             if(this.roles[checked].type === "wolf"){
-                await msg.channel.send(`Player ${String(checked+1)} is bad!`);
+                await msg.channel.send(i18n("game-sesee-bad", message.client.botLocale, String(checked+1)));
                 log(`Player ${String(checked)} revealed to seer as bad`);
             }else{
-                await msg.channel.send(`Player ${String(checked+1)} is good!`);
+                await msg.channel.send(i18n("game-sesee-good", message.client.botLocale, String(checked+1)));
                 log(`Player ${String(checked)} revealed to seer as good`);
             }
             this.day(message, killed, poisoned);
@@ -396,6 +405,7 @@ module.exports = class {
             try{
                 await message.channel.send(i18n("game-day-announce-1", message.client.botLocale, dieCount));
                 await message.channel.send(i18n("game-day-announce-2", message.client.botLocale, died[0]+1, died[1]+1));
+                this.vote(message);
             }catch(e){
                 console.error(e);
             }
@@ -406,10 +416,32 @@ module.exports = class {
                     await message.channel.send(i18n("game-day-announce-3", message.client.botLocale, died[i]+1));
                 }
             }
+            this.vote(message);
         }else if(dieCount === 0){
             await message.channel.send(i18n("game-day-announce-silent-night", message.client.botLocale));
+            this.vote(message);
         }else{
             await message.channel.send("Something went wrong...");
         }
+
+        this.voteKey = (Math.random()*1e16).toString(36); // from https://stackoverflow.com/a/30925561, CC BY-SA 3.0 he-yaeh
+        await message.channel.send(i18n("game-day-instruct-mc", message.client.botLocale, this.voteKey));
+        const collected = await message.channel.awaitMessages(
+            msg => {
+                return msg.content === `!vote ${this.voteKey}` && (msg.member.roles.cache.some(role => role.name === "MC") || msg.member.roles.cache.some(role => role.name === "Developer"));
+            },
+            { max: 1 }
+        );
+        await message.channel.send(`Voting procedure initiated.`);
+        log(`Voting procedure initiated by ${collected.first().author.tag}`);
+        this.vote(message);
+    }
+
+    /**
+     * 
+     * @param {Discord.Message} message 
+     */
+    async vote(message) {
+        
     }
 }
