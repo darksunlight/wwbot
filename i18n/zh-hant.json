@@ -3,10 +3,12 @@
         "authors": [
             "WWBot Dev"
         ],
-        "last-updated": "2021-02-23",
+        "last-updated": "2021-03-13",
         "locale": "zh-hant",
-        "message-documentation": "qqq"
+        "message-documentation": "qqq",
+        "fallback": "en"
     },
+    "and-separator": "和",
     "cmd-endgame-desc": "強行中止現正進行的遊戲",
     "cmd-help-aliases": "**{{PLURAL:$2|別名}}：**$1",
     "cmd-help-cooldown": "**冷卻時間：**$1",
@@ -28,6 +30,7 @@
     "game-day-announce-3": "他們是$1號玩家。",
     "game-day-announce-silent-night": "昨晚無人死。",
     "game-end-message": "遊戲結束！$1獲勝！",
+    "game-vote-msg": "請選擇你想投出的玩家的號碼，或者選擇❎如果你不想投出任何人。",
     "game-wcsave-prompt": "昨晚$1號玩家被殺。使用救藥？",
     "role-gd": "守衛",
     "role-ht": "獵人",

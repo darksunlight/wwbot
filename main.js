@@ -2,6 +2,8 @@ require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const log = require('./src/utils/log.js');
+const success = require('./src/utils/success.js');
+const warn = require('./src/utils/warn.js');
 const i18n = require('./src/i18n.js');
 const server = require("./server/server.js");
 
@@ -16,9 +18,10 @@ const prefix = "!";
 const cooldowns = new Discord.Collection();
 
 client.on('ready', () => {
-    log(`Logged in as ${client.user.tag}!`);
+    success(`Logged in as ${client.user.tag}!`);
     client.botLocale = "en";
     server(client, process.env.PORT);
+    client.starttime = Math.round(new Date().getTime()/1000);
 });
 
 client.on('message', msg => {

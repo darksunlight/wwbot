@@ -3,6 +3,8 @@ module.exports = (client, port) => {
     const bodyParser = require('body-parser');
     const app = express();
     const log = require("../src/utils/log.js");
+    const success = require("../src/utils/success.js");
+    const warn = require("../src/utils/warn.js");
 
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(express.static('./server/public'));
@@ -178,6 +180,6 @@ module.exports = (client, port) => {
     });
 
     app.listen(port, _ => {
-        log(`Server listening at http://localhost:${port}`);
+        success(`Server listening at http://localhost:${port}`);
     });
 }
