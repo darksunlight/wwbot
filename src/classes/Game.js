@@ -578,10 +578,10 @@ module.exports = class {
                 case "id":
                     if(!this.idiotUsed) {
                         this.idiotUsed = true;
-                        await message.channel.send(`Player ${mostvoted[0] + 1} is the idiot! They remain alive.`);
+                        await message.channel.send(i18n("game-vote-announce-idiot-not-eliminated", message.client.botLocale, mostvoted[0] +1));
                         return this.night(message);
                     }else {
-                        this.night(message);
+                        return this.night(message);
                     }
                     break;
                 case "ht":
@@ -624,7 +624,7 @@ module.exports = class {
 
     async htwkOnDie(player, callback) {
         let message = this.message;
-        await message.channel.send(`Player ${player + 1} has a special ability on death! Player ${player + 1}, please respond in your own channel.`);
+        await message.channel.send(i18n("game-htwkondie-announce-hasability", message.client.botLocale, player + 1));
         const channel = await message.guild.channels.cache.find(x => x.name === `${String(player+1)}號`);
         const msg = await channel.send(`You can activate your ability and kill one player. Please choose the number of the player you would like to kill.`);
         let eArray = [];
