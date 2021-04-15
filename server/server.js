@@ -1,3 +1,25 @@
+async function fetchMessages(channel, limit = 200) { // https://stackoverflow.com/a/55153808/15517071 CC BY-SA 4.0 Jason via StackOverflow
+    const sum_messages = [];
+    let last_id;
+
+    while (true) {
+        const options = { limit: 100 };
+        if (last_id) {
+            options.before = last_id;
+        }
+
+        const messages = await channel.messages.fetch(options);
+        sum_messages.push(...messages.array());
+        last_id = messages.last().id;
+
+        if (messages.size != 100 || sum_messages >= limit) {
+            break;
+        }
+    }
+
+    return sum_messages;
+}
+
 module.exports = (client, port) => {
     const express = require("express");
     const bodyParser = require('body-parser');
@@ -177,6 +199,28 @@ module.exports = (client, port) => {
                 res.send(message.content);
             }).catch(console.error);
         }).catch(console.error);
+    });
+
+    app.get('/channel/:id/messages/:limit', async (req, res) => {
+        const channel = await client.channels.fetch(req.params.id);
+        const limit = req.params.limit;
+        if(isNaN(limit)) return res.send("limit is not number!");
+        let messagesArray;
+        if (limit < 101) {
+            const messages = await channel.messages.fetch({ limit: req.params.limit });
+            messagesArray = messages.array();
+        }else {
+            messagesArray = await fetchMessages(channel, limit);
+        }
+        console.log(messagesArray);
+        let response = `<pre>`;
+        messagesArray.forEach(message => {
+            const attachments = message.attachments.array();
+            const time = new Date(message.createdTimestamp);
+            response += `${message.id} - ${time.toISOString()} - ${message.author.username}#${message.author.discriminator}: ${message.content}${attachments.length?" (" + String(attachments.length) + " attachment(s))":""}\n`;
+        });
+        response += `</pre>`;
+        res.send(response);
     });
 
     app.listen(port, _ => {

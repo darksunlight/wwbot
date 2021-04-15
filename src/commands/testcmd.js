@@ -1,6 +1,6 @@
 const Code = require('../classes/Code.js');
 module.exports = {
-    name: 'test',
+    name: 'testcmd',
     su: true,
     cooldown: 0.1,
     description: '',

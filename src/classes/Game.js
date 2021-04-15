@@ -3,6 +3,8 @@ const Code = require('./Code.js');
 const Role = require('./Role.js');
 const Discord = require('discord.js');
 const log = require('../utils/log.js');
+const success = require('../utils/success.js');
+const warn = require('../utils/warn.js');
 const intToEmoji = require('../utils/intToEmoji.js');
 const emojiToAny = require('../utils/emojiToAny.js');
 const endgame = require('../utils/endgame.js');
@@ -48,7 +50,7 @@ module.exports = class {
         this.message = message;
         if(!this.code.isValid()){
             this.ended = true;
-            log(message.author.tag + " attempted to start a new game with code " + this.code.code + " but failed due to: The code is invalid.")
+            warn(message.author.tag + " attempted to start a new game with code " + this.code.code + " but failed due to: The code is invalid.")
             return message.channel.send(`The code ${this.code.code} is invalid.`);
         }
         message.channel.send(`Starting a new game with code ${this.code.code}...`);
@@ -291,15 +293,15 @@ module.exports = class {
                 const collected = await msg.awaitReactions(
                     async (r, u) => {
                         if(u.bot || !eArray.includes(r.emoji.name)) return false;
-                        const user = await message.guild.members.fetch(u.id);
-                        let roles = user.roles.cache.array();
+                        const member = await message.guild.members.fetch(u.id);
+                        let roles = member.roles.cache.array();
                         for(let i = 0; i < roles.length; i++){
                             let role = roles[i];
                             if(role.name == "Dead"){
-                                log(`Spectator ${user.user.tag} attempted to use the poison potion despite being dead.`);
+                                log(`Spectator ${member.user.tag} attempted to use the poison potion despite being dead.`);
                                 return false;
                             }else if(role.name == "MC" || role.name == "Developer" || role.name == `${String(this.witch+1)}號`){
-                                log(`${user.user.tag} made a decision as witch, wcpoison`);
+                                log(`${member.user.tag} made a decision as witch, wcpoison`);
                                 return true;
                             }
                         }
@@ -608,7 +610,8 @@ module.exports = class {
                     }
                     break;
             }
-        }else if(mostvoted.length > 1) {
+        }else if(mostvoted.length > 1 && maxvotes > 0) {
+            // TODO: Implement re-vote mechanism
             let msgText = i18n("game-vote-samevotes-0", message.client.botLocale, mostvoted.length, maxvotes);
             let hl = "";
             for(let i = 0; i < mostvoted.length - 2; i++) {
@@ -618,6 +621,9 @@ module.exports = class {
             hl = i18n("game-vote-samevotes-1", message.client.botLocale, hl);
             msgText = msgText.concat("\n", hl);
             await message.channel.send(msgText);
+            this.night(message);
+        }else if(maxvotes === 0) {
+            await message.channel.send(i18n("game-vote-novotes"));
             this.night(message);
         }
     }
@@ -667,7 +673,7 @@ module.exports = class {
                 log(`Killed player is hunter or wolf king, recursion!`);
                 this.htwkOnDie(killed, callback);
             }else {
-                log(`Killed player is not hunter or wolf king, continue`);
+                log(`Killed player ${killed} is not hunter or wolf king, continue`);
                 switch(callback){
                     case "vote":
                         this.vote(message);
@@ -676,7 +682,8 @@ module.exports = class {
                         this.night(message);
                         break;
                     default:
-                        return log("unknown callback for htwkOnDie");
+                        message.channel.send(i18n("error-msg", message.client.botLocale, "classes/Game/htwkOnDie: unknown callback"));
+                        return warn("unknown callback for htwkOnDie");
                 }
             }
         }else{
