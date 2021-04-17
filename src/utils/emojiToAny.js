@@ -21,5 +21,8 @@ const emojiToAny = {
  * @returns {number|boolean}
  */
 module.exports = x => {
+    if(typeof x !== "string") {
+        throw new TypeError(`Expected string for first argument, got ${typeof x}`);
+    }
     return emojiToAny[x];
 }

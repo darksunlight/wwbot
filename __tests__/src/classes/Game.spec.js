@@ -6,6 +6,7 @@ jest.mock("discord.js");
 describe("Game object", () => {
     test("creating new Game", () => {
         const client = new Discord.Client();
-        console.log(client);
+        client.login();
+        //console.log(client);
     });
 });
